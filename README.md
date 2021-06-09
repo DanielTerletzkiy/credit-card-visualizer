@@ -10,5 +10,5 @@ This is a prototype for a future single-file component lib for vue2.
 # TODO
 - Add export to parent Components
 - Chnage back design
-- Input to be optional
+- ~~Input to be optional~~
 - Change gradients with props
