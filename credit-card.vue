@@ -2,12 +2,11 @@
   <div
     style="
       display: flex;
-      width: 650px;
-      background: white;
+      width: min-content;
       box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-      padding: 12px;
       border-radius: 24px;
     "
+    :style="{padding: showInputs?'12px':0, background: showInputs?'white':'transparent',}"
   >
     <div class="container" :class="flip ? 'flip' : ''">
       <div
@@ -74,6 +73,7 @@
       </div>
     </div>
     <div
+      v-if="showInputs"
       style="
         margin-left: 10px;
         margin-right: 10px;
@@ -124,6 +124,13 @@
 
 <script>
 export default {
+  props: {
+    showInputs: {
+      default: true,
+      type: Boolean,
+    },
+  },
+
   data: () => ({
     cc: 6490499495563199,
     name: '',
@@ -212,11 +219,6 @@ export default {
 </script>
 
 <style>
-body {
-  background: linear-gradient(to right, #4e54c8, #8f94fb);
-  font-family: 'Century Gothic', CenturyGothic, Geneva, AppleGothic, sans-serif;
-}
-
 :is(h1, h2, h3, h4, h5, h6) {
   color: white;
   font-weight: 200;
