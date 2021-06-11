@@ -8,7 +8,7 @@ This is a prototype for a future single-file component lib for vue2.
 - Plain CSS + HTML Inputfields to enter Details
 
 # TODO
-- Add export to parent Components
+- ~~Add export to parent Components~~
 - Add more ui elements to back plate
 - ~~Input to be optional~~
 - Change gradients with props
