@@ -6,7 +6,10 @@
       box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
       border-radius: 24px;
     "
-    :style="{padding: showInputs?'12px':0, background: showInputs?'white':'transparent',}"
+    :style="{
+      padding: showInputs ? padding+'px' : 0,
+      background: showInputs ? 'white' : 'transparent',
+    }"
   >
     <div class="container" :class="flip ? 'flip' : ''">
       <div
@@ -21,7 +24,8 @@
           class="front"
           style="border-radius: 24px; width: 340px; height: 200px"
           :style="{
-            background: 'linear-gradient(to right,' + getCardAccents + ')',
+            background:
+              'linear-gradient(to right,' + getCardAcardNumberents + ')',
           }"
         >
           <h3
@@ -30,7 +34,7 @@
             {{ creditCardType }}
           </h3>
           <div style="position: absolute; left: 16px">
-            <span style="font-size: 12px"> CC </span>
+            <span style="font-size: 12px"> Card Number </span>
             <h4 style="margin-top: 0px">
               {{ getNumber }}
             </h4>
@@ -55,7 +59,8 @@
           class="back"
           style="border-radius: 24px; width: 340px; height: 200px"
           :style="{
-            background: 'linear-gradient(to left,' + getCardAccents + ')',
+            background:
+              'linear-gradient(to left,' + getCardAcardNumberents + ')',
           }"
         >
           <h3
@@ -84,22 +89,40 @@
     >
       <div>
         <h5 style="margin: 0px; margin-bottom: 6px; color: rgb(50, 50, 50)">
-          CC
+          Card Number
         </h5>
-        <input v-model="cc" type="number" id="cc" placeholder="CC" />
+        <input
+          v-model="cardNumber"
+          type="number"
+          id="cardNumber"
+          placeholder="cardNumber"
+          @input="$emit('update:cardNumber', cardNumber)"
+        />
       </div>
       <div>
         <h5 style="margin: 0px; margin-bottom: 6px; color: rgb(50, 50, 50)">
           Name
         </h5>
-        <input v-model="name" type="name" id="name" placeholder="Name" />
+        <input
+          v-model="name"
+          type="name"
+          id="name"
+          placeholder="Name"
+          @input="$emit('update:name', name)"
+        />
       </div>
       <div style="display: flex">
         <div>
           <h5 style="margin: 0px; margin-bottom: 6px; color: rgb(50, 50, 50)">
             Date
           </h5>
-          <input v-model="date" type="month" id="date" placeholder="date" />
+          <input
+            v-model="expirationDate"
+            type="month"
+            id="date"
+            placeholder="date"
+            @input="$emit('update:expirationDate', expirationDate)"
+          />
         </div>
         <div style="margin: 8px" />
         <div>
@@ -107,14 +130,16 @@
             CVC
           </h5>
           <input
-            @focus="flip = true"
-            @blur="flip = false"
+            style="min-width: 24px"
+            @focus="$emit('update:flip', true)"
+            @blur="$emit('update:flip', false)"
             v-model="cvc"
             type="number"
             max="999"
             min="000"
             id="cvc"
             placeholder="CVC"
+            @input="$emit('update:cvc', cvc)"
           />
         </div>
       </div>
@@ -125,37 +150,64 @@
 <script>
 export default {
   props: {
+    cardNumber: {
+      default: 0,
+      type: Number,
+    },
+    name: {
+      default: undefined,
+      type: String,
+    },
+    expirationDate: {
+      default: undefined,
+      type: String,
+    },
+    cvc: {
+      default: undefined,
+      type: Number,
+    },
+
     showInputs: {
       default: true,
       type: Boolean,
     },
+    flip: {
+      default: false,
+      type: Boolean,
+    },
+    padding: {
+      default: 12,
+      type: Number,
+    },
   },
 
-  data: () => ({
-    cc: 6490499495563199,
-    name: '',
-    date: '',
-    cvc: undefined,
+  data: () => ({}),
 
-    flip: false,
-  }),
+  mounted: function () {
+    //this.$nextTick(() => {
+    //  this.cardNumber = this.cardNumber;
+    //});
+  },
 
   computed: {
     getDate() {
-      var date = this.date;
+      var date = this.expirationDate;
       var dateFrags = date.split('-');
       date = dateFrags[1] + '/' + dateFrags[0].slice(-2);
 
       return date.includes('undefined') ? null : date;
     },
     getNumber() {
-      var number = this.cc;
-      while (number.length < 16) {
+      var number = this.cardNumber;
+      if (!number) {
+        number = '';
+      }
+      while ((number && number.length < 16) || number == '') {
         number += 'X';
       }
       return number;
     },
-    getCardAccents() {
+    getCardAcardNumberents() {
       switch (this.creditCardType) {
         case 'MASTERCARD':
           return '#EB001B, #FF5F00, #F79E1B';
@@ -187,29 +239,32 @@ export default {
       let diners = new RegExp('^3[0689][0-9]{12}[0-9]*$');
       let jcb = new RegExp('^35[0-9]{14}[0-9]*$');
 
-      if (visa.test(this.cc)) {
+      if (visa.test(this.cardNumber)) {
         return 'VISA';
       }
-      if (amex.test(this.cc)) {
+      if (amex.test(this.cardNumber)) {
         return 'AMEX';
       }
-      if (mastercard.test(this.cc) || mastercard2.test(this.cc)) {
+      if (
+        mastercard.test(this.cardNumber) ||
+        mastercard2.test(this.cardNumber)
+      ) {
         return 'MASTERCARD';
       }
       if (
-        disco1.test(this.cc) ||
-        disco2.test(this.cc) ||
-        disco3.test(this.cc)
+        disco1.test(this.cardNumber) ||
+        disco2.test(this.cardNumber) ||
+        disco3.test(this.cardNumber)
       ) {
         return 'DISCOVER';
       }
-      if (diners.test(this.cc)) {
+      if (diners.test(this.cardNumber)) {
         return 'DINERS';
       }
-      if (jcb.test(this.cc)) {
+      if (jcb.test(this.cardNumber)) {
         return 'JCB';
       }
-      if (cup1.test(this.cc) || cup2.test(this.cc)) {
+      if (cup1.test(this.cardNumber) || cup2.test(this.cardNumber)) {
         return 'CHINA UNION PAY';
       }
       return undefined;
